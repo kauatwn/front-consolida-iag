@@ -1,0 +1,92 @@
+<div class="bg-surface font-body-md text-on-surface flex min-h-screen flex-col">
+  <!-- Top Navigation Header -->
+  <header
+    class="bg-surface/95 pt-safe fixed top-0 z-50 w-full shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur-xl"
+  >
+    <div class="px-gutter-mobile flex h-20 items-center justify-between">
+      <div class="gap-space-xs flex items-center">
+        <span class="material-symbols-outlined text-secondary text-[24px]">local_dining</span>
+        <div>
+          <h1
+            class="font-headline-md text-body-lg text-primary leading-none font-bold tracking-tight"
+          >
+            Consolida IAG
+          </h1>
+          <span class="font-caption text-caption text-on-surface-variant"
+            >Instituto Anchieta Grajaú</span
+          >
+        </div>
+      </div>
+
+      <div
+        class="bg-error-container px-space-sm text-on-error-container flex items-center gap-1.5 rounded-full py-1"
+      >
+        <span class="bg-error h-2 w-2 rounded-full"></span>
+        <span class="font-caption text-caption font-bold">Ciclo Fechado</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Central Content -->
+  <main class="px-gutter-mobile flex flex-1 items-center justify-center pt-24 pb-12">
+    <div
+      class="bg-surface-container-lowest p-space-lg flex w-full max-w-md flex-col items-center rounded-2xl text-center shadow-md"
+    >
+      <!-- Icon Container -->
+      <div
+        class="mb-space-md bg-surface-container-high text-on-surface-variant flex h-20 w-20 items-center justify-center rounded-full"
+      >
+        <span class="material-symbols-outlined text-error text-[42px]">lock_clock</span>
+      </div>
+
+      <span class="font-caption text-caption text-error font-bold tracking-wider uppercase">
+        Acesso Temporariamente Bloqueado
+      </span>
+
+      <h2 class="mt-space-xs font-headline-md text-headline-md text-primary font-bold">
+        Ciclo Semanal Encerrado
+      </h2>
+
+      <p class="mt-space-sm text-body-md text-on-surface-variant">
+        O ciclo de compras desta semana foi encerrado. Novos pedidos e alterações não são permitidos
+        até a abertura do próximo ciclo pelo setor de compras.
+      </p>
+
+      <div class="mt-space-md bg-surface-container-low p-space-sm w-full rounded-xl text-left">
+        <div class="flex items-start gap-2">
+          <span class="material-symbols-outlined text-primary text-[20px]">info</span>
+          <div class="text-caption text-on-surface-variant">
+            <strong class="text-on-surface">O que fazer agora?</strong>
+            <p class="mt-0.5">
+              Caso sua cozinha tenha uma emergência operacional não atendida, procure diretamente o
+              gestor de compras da instituição.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      @if (checkMessage()) {
+        <div
+          class="mt-space-md bg-surface-container-high p-space-sm font-caption text-caption text-on-surface w-full rounded-lg"
+        >
+          {{ checkMessage() }}
+        </div>
+      }
+
+      <button
+        type="button"
+        (click)="checkCycleAgain()"
+        [disabled]="isChecking()"
+        class="mt-space-lg bg-primary px-space-md font-headline-md text-body-md text-on-primary flex min-h-[52px] w-full items-center justify-center gap-2 rounded-xl font-bold shadow-md transition-transform active:scale-95 disabled:opacity-50"
+      >
+        @if (isChecking()) {
+          <span class="material-symbols-outlined animate-spin text-[20px]">progress_activity</span>
+          <span>Verificando...</span>
+        } @else {
+          <span class="material-symbols-outlined text-[20px]">refresh</span>
+          <span>Verificar se o Ciclo Abriu</span>
+        }
+      </button>
+    </div>
+  </main>
+</div>
