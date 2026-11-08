@@ -44,5 +44,14 @@
     "tailwindcss": "^4.1.12",
     "typescript": "~6.0.2",
     "typescript-eslint": "8.71.0"
+  },
+  "lint-staged": {
+    "**/*.{ts,html}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "**/*.{css,json,md}": [
+      "prettier --write"
+    ]
   }
 }
