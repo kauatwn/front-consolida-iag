@@ -1,17 +1,17 @@
 import { Component, inject } from '@angular/core';
+import { LucideCircleCheck } from '@lucide/angular';
 import { TotemCartState } from '../totem-cart.state';
 
 @Component({
-  imports: [],
   selector: 'app-cart-summary-bar',
-  styles: `
-    :host {
-      display: contents;
-    }
-  `,
+  imports: [LucideCircleCheck],
+  host: {
+    class: 'contents',
+  },
   template: `
     <div
-      class="px-gutter-mobile fixed bottom-20 left-0 z-40 w-full transition-all duration-300"
+      [inert]="!cartState.hasSelectedItems()"
+      class="px-gutter-mobile pb-safe fixed bottom-4 left-0 z-40 w-full transition-all duration-300"
       [class.translate-y-4]="!cartState.hasSelectedItems()"
       [class.opacity-0]="!cartState.hasSelectedItems()"
       [class.pointer-events-none]="!cartState.hasSelectedItems()"
@@ -22,8 +22,11 @@ import { TotemCartState } from '../totem-cart.state';
         class="gap-space-sm bg-inverse-surface/95 p-space-sm text-inverse-on-surface mx-auto flex max-w-md items-center justify-between rounded-xl shadow-xl backdrop-blur-md"
       >
         <div class="flex min-w-0 flex-col">
-          <div class="flex items-center gap-1">
-            <span class="bg-secondary-fixed h-2 w-2 animate-pulse rounded-full"></span>
+          <div class="flex items-center gap-1.5">
+            <span
+              class="bg-secondary-fixed size-2 animate-pulse rounded-full"
+              aria-hidden="true"
+            ></span>
             <span class="font-caption text-caption text-inverse-on-surface/90 font-bold">
               Pedido em Preparo ({{ cartState.activeServiceDetail().acronym }})
             </span>
@@ -32,21 +35,22 @@ import { TotemCartState } from '../totem-cart.state';
             <strong class="font-label-numeric text-inverse-on-surface">
               {{ cartState.totalItemsCount() }}
             </strong>
-            {{ cartState.totalItemsCount() === 1 ? 'item' : 'itens' }} •
+            {{ cartState.totalItemsCount() === 1 ? 'item' : 'itens' }} &bull;
             <strong class="font-label-numeric text-inverse-on-surface">
               {{ cartState.totalUnits() }}
             </strong>
             un. total
           </span>
         </div>
+
         <button
           type="button"
           (click)="onFinalize()"
           [disabled]="!cartState.canSubmit()"
-          class="bg-secondary px-space-md font-headline-md text-body-md text-on-secondary flex min-h-[52px] shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg font-bold shadow-md transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+          class="bg-secondary px-space-md font-headline-md text-body-md text-on-secondary flex min-h-13 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg font-bold shadow-md transition-transform active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span>Finalizar</span>
-          <span class="material-symbols-outlined text-[20px]">check_circle</span>
+          <svg lucideCircleCheck [size]="20" [strokeWidth]="2.5" aria-hidden="true"></svg>
         </button>
       </div>
     </div>
