@@ -1,6 +1,12 @@
 import { CatalogProduct } from '../catalog/product.model';
 
-export type ServiceCode = 'CEI' | 'CCA' | 'CJ';
+export const ServiceCode = {
+  CEI: 'CEI',
+  CCA: 'CCA',
+  CJ: 'CJ',
+} as const;
+
+export type ServiceCode = (typeof ServiceCode)[keyof typeof ServiceCode];
 
 export interface ServiceDetail {
   code: ServiceCode;
@@ -10,20 +16,20 @@ export interface ServiceDetail {
 }
 
 export const INSTITUTIONAL_SERVICES: Record<ServiceCode, ServiceDetail> = {
-  CEI: {
-    code: 'CEI',
+  [ServiceCode.CEI]: {
+    code: ServiceCode.CEI,
     acronym: 'CEI',
     name: 'Centro de Educação Infantil',
     fullName: 'CEI - Centro de Educação Infantil',
   },
-  CCA: {
-    code: 'CCA',
+  [ServiceCode.CCA]: {
+    code: ServiceCode.CCA,
     acronym: 'CCA',
     name: 'Centro para Crianças e Adolescentes',
     fullName: 'CCA - Centro para Crianças e Adolescentes',
   },
-  CJ: {
-    code: 'CJ',
+  [ServiceCode.CJ]: {
+    code: ServiceCode.CJ,
     acronym: 'CJ',
     name: 'Centro de Juventude',
     fullName: 'CJ - Centro de Juventude',
