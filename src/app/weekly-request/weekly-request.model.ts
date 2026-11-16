@@ -47,12 +47,30 @@ export interface SubmitWeeklyRequestPayload {
   items: RequestItemPayload[];
 }
 
+export interface EditWeeklyRequestPayload {
+  observation?: string;
+  items: RequestItemPayload[];
+}
+
 export interface SubmitWeeklyRequestResponse {
   id: string;
   serviceCode: ServiceCode;
-  cycleId?: string;
-  submissionDate?: string;
-  itemsCount?: number;
+  cycleId: string;
+  createdAt: string;
+}
+
+export interface RequestItemDetailsResponse {
+  productId: string;
+  quantity: number;
+}
+
+export interface WeeklyRequestDetailsResponse {
+  id: string;
+  serviceCode: ServiceCode;
+  cycleId: string;
+  observation: string | null;
+  createdAt: string;
+  items: RequestItemDetailsResponse[];
 }
 
 export interface CartItem {

@@ -1,6 +1,6 @@
 import { Component, inject } from '@angular/core';
 import { LucideCircleCheck } from '@lucide/angular';
-import { TotemCartState } from '../totem-cart.state';
+import { TotemCartState } from '../totem-cart-state';
 
 @Component({
   selector: 'app-cart-summary-bar',

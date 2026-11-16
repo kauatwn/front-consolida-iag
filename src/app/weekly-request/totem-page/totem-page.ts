@@ -1,13 +1,28 @@
-import { Component, effect, inject, input } from '@angular/core';
-import { LucideCircleCheck, LucideFileText, LucideUtensils } from '@lucide/angular';
-import { CatalogService } from '../../catalog/catalog.service';
+import {
+  Component,
+  DOCUMENT,
+  ElementRef,
+  effect,
+  inject,
+  input,
+  signal,
+  viewChildren,
+} from '@angular/core';
+import {
+  LucideCircleCheck,
+  LucideFileText,
+  LucidePencilLine,
+  LucideUtensils,
+} from '@lucide/angular';
+import { Catalog } from '../../catalog/catalog';
 import { CategoryIcon } from '../../catalog/category-icon/category-icon';
-import { CycleService } from '../../cycle-management/cycle.service';
+import { Cycle } from '../../cycle-management/cycle';
 import { CartSummaryBar } from '../cart-summary-bar/cart-summary-bar';
 import { ConfirmOrderModal } from '../confirm-order-modal/confirm-order-modal';
 import { ProductCard } from '../product-card/product-card';
-import { TotemCartState } from '../totem-cart.state';
+import { TotemCartState } from '../totem-cart-state';
 import { ServiceCode } from '../weekly-request.model';
+import { WeeklyRequest } from '../weekly-request';
 
 @Component({
   selector: 'app-totem-page',
@@ -18,6 +33,7 @@ import { ServiceCode } from '../weekly-request.model';
     CategoryIcon,
     LucideFileText,
     LucideCircleCheck,
+    LucidePencilLine,
     LucideUtensils,
   ],
   host: {
@@ -47,7 +63,7 @@ import { ServiceCode } from '../weekly-request.model';
             <div
               class="bg-tertiary-fixed text-on-tertiary-fixed flex items-center gap-1.5 rounded-full px-3 py-1"
             >
-              <span class="bg-tertiary-container h-2 w-2 animate-pulse rounded-full"></span>
+              <span class="bg-tertiary-container size-2 animate-pulse rounded-full"></span>
               <span class="font-caption text-caption leading-none font-bold whitespace-nowrap">
                 Ciclo Aberto
               </span>
@@ -61,10 +77,76 @@ import { ServiceCode } from '../weekly-request.model';
           </p>
         </header>
 
+        <!-- Edit Mode Notice Banner (RN-02.6) -->
+        @if (cartState.isEditMode()) {
+          <div
+            role="status"
+            class="mb-space-sm border-secondary/30 bg-secondary-fixed/50 p-space-sm text-on-surface flex items-start gap-2.5 rounded-xl border"
+          >
+            <svg
+              lucidePencilLine
+              [size]="18"
+              class="text-secondary mt-0.5 shrink-0"
+              aria-hidden="true"
+            ></svg>
+            <p class="font-caption text-caption leading-snug">
+              <strong>Pedido já enviado nesta semana.</strong> Os itens abaixo refletem a última
+              solicitação registrada e podem ser ajustados enquanto o ciclo estiver aberto.
+            </p>
+          </div>
+        }
+
+        <!-- Category Scroll Pills -->
+        <nav
+          aria-label="Categorias do catálogo"
+          class="border-outline-variant/50 bg-surface/95 mb-space-sm sticky top-0 z-20 -mx-3 border-b px-3 backdrop-blur-md"
+        >
+          <div class="no-scrollbar flex items-center gap-2 overflow-x-auto py-2">
+            <button
+              #categoryPill
+              data-category="all"
+              type="button"
+              (click)="scrollToTop()"
+              [attr.aria-pressed]="activeCategory() === 'all'"
+              class="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-all duration-150"
+              [class]="
+                activeCategory() === 'all'
+                  ? 'bg-primary text-on-primary shadow-sm'
+                  : 'text-on-surface-variant hover:bg-surface-container'
+              "
+            >
+              Todos os Itens
+            </button>
+
+            @for (group of catalogService.groupedProducts(); track group.category) {
+              <button
+                #categoryPill
+                [attr.data-category]="group.category"
+                type="button"
+                (click)="scrollToCategory(group.category)"
+                [attr.aria-pressed]="activeCategory() === group.category"
+                class="flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold whitespace-nowrap transition-all duration-150"
+                [class]="
+                  activeCategory() === group.category
+                    ? 'bg-primary text-on-primary shadow-sm'
+                    : 'text-on-surface-variant hover:bg-surface-container'
+                "
+              >
+                <app-category-icon [category]="group.category" [size]="14" />
+                <span>{{ group.categoryDisplayName }}</span>
+              </button>
+            }
+          </div>
+        </nav>
+
         <!-- Product Groups by Category -->
         <div class="gap-space-md flex flex-col" id="catalog-list">
           @for (group of catalogService.groupedProducts(); track group.category) {
-            <section class="gap-space-sm flex flex-col">
+            <section
+              #categorySection
+              [id]="'section-' + group.category"
+              class="gap-space-sm flex scroll-mt-14 flex-col"
+            >
               <div class="my-space-xs gap-space-xs px-space-xs flex items-center">
                 <app-category-icon [category]="group.category" [size]="20" class="text-secondary" />
                 <h2
@@ -155,28 +237,131 @@ import { ServiceCode } from '../weekly-request.model';
   `,
 })
 export class TotemPage {
-  protected readonly catalogService = inject(CatalogService);
-  protected readonly cycleService = inject(CycleService);
+  private readonly document = inject(DOCUMENT);
+  protected readonly catalogService = inject(Catalog);
+  protected readonly cycleService = inject(Cycle);
   protected readonly cartState = inject(TotemCartState);
+  private readonly weeklyRequestService = inject(WeeklyRequest);
 
+  protected readonly activeCategory = signal<string>('all');
   readonly serviceCode = input<string>();
+
+  private readonly sectionRefs = viewChildren<ElementRef<HTMLElement>>('categorySection');
+  private readonly pillRefs = viewChildren<ElementRef<HTMLButtonElement>>('categoryPill');
+
+  private isProgrammaticScroll = false;
+  private scrollLockTimer: ReturnType<typeof setTimeout> | null = null;
 
   constructor() {
     this.catalogService.listCatalogProducts().subscribe();
 
-    effect(() => {
-      const code = this.serviceCode()?.toUpperCase();
+    effect((onCleanup) => {
+      const rawCode = this.serviceCode()?.toUpperCase();
       if (
-        code &&
-        (code === ServiceCode.CEI || code === ServiceCode.CCA || code === ServiceCode.CJ)
+        !rawCode ||
+        (rawCode !== ServiceCode.CEI && rawCode !== ServiceCode.CCA && rawCode !== ServiceCode.CJ)
       ) {
-        this.cartState.setService(code as ServiceCode);
+        return;
       }
+
+      const code = rawCode as ServiceCode;
+      this.cartState.setService(code);
+      this.cartState.isLoadingRequest.set(true);
+
+      const sub = this.weeklyRequestService.consultActiveRequest(code).subscribe({
+        next: (existingRequest) => {
+          this.cartState.hydrateExistingRequest(existingRequest);
+          this.cartState.isLoadingRequest.set(false);
+        },
+        error: () => {
+          this.cartState.isLoadingRequest.set(false);
+        },
+      });
+
+      onCleanup(() => sub.unsubscribe());
     });
+
+    effect(() => {
+      const current = this.activeCategory();
+      const activePill = this.pillRefs().find(
+        (ref) => ref.nativeElement.dataset['category'] === current,
+      );
+      activePill?.nativeElement.scrollIntoView({
+        behavior: 'smooth',
+        inline: 'center',
+        block: 'nearest',
+      });
+    });
+
+    effect((onCleanup) => {
+      const sections = this.sectionRefs();
+      if (sections.length === 0) {
+        return;
+      }
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          if (this.isProgrammaticScroll) {
+            return;
+          }
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              this.activeCategory.set(entry.target.id.replace('section-', ''));
+              break;
+            }
+          }
+        },
+        { threshold: 0, rootMargin: '-15% 0px -75% 0px' },
+      );
+
+      for (const ref of sections) {
+        observer.observe(ref.nativeElement);
+      }
+
+      const win = this.document.defaultView;
+      const onWindowScroll = () => {
+        if (!this.isProgrammaticScroll && (win?.scrollY ?? 0) < 80) {
+          this.activeCategory.set('all');
+        }
+      };
+
+      win?.addEventListener('scroll', onWindowScroll, { passive: true });
+
+      onCleanup(() => {
+        observer.disconnect();
+        win?.removeEventListener('scroll', onWindowScroll);
+        if (this.scrollLockTimer !== null) {
+          clearTimeout(this.scrollLockTimer);
+        }
+      });
+    });
+  }
+
+  protected scrollToCategory(category: string): void {
+    this.lockObserverTemporarily();
+    this.activeCategory.set(category);
+    const target = this.sectionRefs().find((ref) => ref.nativeElement.id === `section-${category}`);
+    target?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  protected scrollToTop(): void {
+    this.lockObserverTemporarily();
+    this.activeCategory.set('all');
+    this.document.defaultView?.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   protected onObservationInput(event: Event): void {
     const target = event.target as HTMLTextAreaElement;
     this.cartState.setObservation(target.value);
+  }
+
+  private lockObserverTemporarily(): void {
+    this.isProgrammaticScroll = true;
+    if (this.scrollLockTimer !== null) {
+      clearTimeout(this.scrollLockTimer);
+    }
+    this.scrollLockTimer = setTimeout(() => {
+      this.isProgrammaticScroll = false;
+    }, 650);
   }
 }
