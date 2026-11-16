@@ -1,6 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpStatusCode } from '@angular/common/http';
 import { inject, Service } from '@angular/core';
 import { catchError, Observable, of, throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
 import {
   ServiceCode,
   SubmitWeeklyRequestPayload,
@@ -17,7 +18,7 @@ export class RequestConflictError extends Error {
 @Service()
 export class WeeklyRequestService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = '/api/v1/requests';
+  private readonly apiUrl = `${environment.apiUrl}/requests`;
 
   /**
    * Submits a weekly request for the active purchasing cycle.

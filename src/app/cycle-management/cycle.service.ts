@@ -1,14 +1,13 @@
 import { HttpClient, HttpResponse, HttpStatusCode } from '@angular/common/http';
-import { computed, inject, Injectable, signal } from '@angular/core';
+import { computed, inject, Service, signal } from '@angular/core';
 import { catchError, map, Observable, of, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { WeeklyCycle } from './cycle.model';
 
-@Injectable({
-  providedIn: 'root',
-})
+@Service()
 export class CycleService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = '/api/v1/cycles';
+  private readonly apiUrl = `${environment.apiUrl}/cycles`;
 
   private readonly _currentCycle = signal<WeeklyCycle | null>(null);
   readonly currentCycle = this._currentCycle.asReadonly();
