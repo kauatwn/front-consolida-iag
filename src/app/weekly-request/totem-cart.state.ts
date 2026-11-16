@@ -50,12 +50,11 @@ export class TotemCartState {
   });
 
   /**
-   * Total mathematical sum of all requested quantities
+   * Total mathematical sum of all requested quantities (integer units)
    */
   readonly totalUnits = computed(() => {
     const q = this._quantities();
-    const sum = Object.values(q).reduce((acc, curr) => (curr > 0 ? acc + curr : acc), 0);
-    return Math.round(sum * 100) / 100;
+    return Object.values(q).reduce((acc, curr) => (curr > 0 ? acc + Math.floor(curr) : acc), 0);
   });
 
   /**
@@ -69,10 +68,10 @@ export class TotemCartState {
   readonly canSubmit = computed(() => this.hasSelectedItems() && !this.isSubmitting());
 
   /**
-   * Updates or sets quantity for a specific product
+   * Updates or sets unitary quantity for a specific product
    */
   setQuantity(productId: string, quantity: number): void {
-    const sanitized = Math.max(0, Math.round(quantity * 100) / 100);
+    const sanitized = Math.max(0, Math.floor(quantity || 0));
     this._quantities.update((prev) => ({
       ...prev,
       [productId]: sanitized,
@@ -80,20 +79,20 @@ export class TotemCartState {
   }
 
   /**
-   * Increments quantity by the product's step (or default 1)
+   * Increments quantity by 1 unit
    */
-  increment(productId: string, step = 1): void {
+  increment(productId: string): void {
     const current = this.getQuantity(productId);
-    this.setQuantity(productId, current + step);
+    this.setQuantity(productId, current + 1);
   }
 
   /**
-   * Decrements quantity by step, preventing negative values
+   * Decrements quantity by 1 unit, preventing negative values
    */
-  decrement(productId: string, step = 1): void {
+  decrement(productId: string): void {
     const current = this.getQuantity(productId);
     if (current > 0) {
-      this.setQuantity(productId, Math.max(0, current - step));
+      this.setQuantity(productId, Math.max(0, current - 1));
     }
   }
 
