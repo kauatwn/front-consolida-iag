@@ -2,7 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { LucideInfo, LucideLock, LucideRefreshCw } from '@lucide/angular';
 import { CycleStatus } from '../cycle.model';
-import { CycleService } from '../cycle.service';
+import { Cycle } from '../cycle';
 
 @Component({
   selector: 'app-cycle-closed-page',
@@ -84,7 +84,7 @@ import { CycleService } from '../cycle.service';
 })
 export class CycleClosedPage {
   private readonly router = inject(Router);
-  private readonly cycleService = inject(CycleService);
+  private readonly cycleService = inject(Cycle);
 
   protected readonly isChecking = signal<boolean>(false);
   protected readonly checkMessage = signal<string | null>(null);

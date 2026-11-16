@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { CatalogProduct, ProductCategory, UnitMeasure } from '../../catalog/product.model';
 import { ProductCard } from './product-card';
-import { CatalogProduct } from '../../catalog/product.model';
 
 describe('ProductCard', () => {
   let component: ProductCard;
@@ -9,11 +9,11 @@ describe('ProductCard', () => {
   const mockProduct: CatalogProduct = {
     id: 'test-123',
     name: 'Arroz Agulhinha Tipo 1',
-    unitMeasure: 'kg',
-    category: 'GRAOS_E_CEREAIS',
+    unitMeasure: UnitMeasure.KG,
+    category: ProductCategory.GRAOS_E_CEREAIS,
     categoryDisplayName: 'Grãos e Cereais',
+    description: 'Fardo 5kg',
     active: true,
-    step: 5,
   };
 
   beforeEach(async () => {
@@ -32,10 +32,11 @@ describe('ProductCard', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should display the product name and unit measure', () => {
+  it('should display the product name, description and unit measure', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.textContent).toContain('Arroz Agulhinha Tipo 1');
-    expect(compiled.textContent).toContain('kg');
+    expect(compiled.textContent).toContain('Fardo 5kg');
+    expect(compiled.textContent).toContain('Kg');
   });
 
   it('should emit increment when clicking the plus button', () => {
@@ -45,7 +46,7 @@ describe('ProductCard', () => {
     });
 
     const plusBtn = fixture.nativeElement.querySelector(
-      'button[aria-label="Aumentar Arroz Agulhinha Tipo 1"]',
+      'button[aria-label="Aumentar Arroz Agulhinha Tipo 1"]'
     ) as HTMLButtonElement;
 
     plusBtn.click();
@@ -54,7 +55,7 @@ describe('ProductCard', () => {
 
   it('should have decrement disabled when quantity is zero', () => {
     const minusBtn = fixture.nativeElement.querySelector(
-      'button[aria-label="Diminuir Arroz Agulhinha Tipo 1"]',
+      'button[aria-label="Diminuir Arroz Agulhinha Tipo 1"]'
     ) as HTMLButtonElement;
 
     expect(minusBtn.disabled).toBeTrue();
@@ -70,11 +71,27 @@ describe('ProductCard', () => {
     });
 
     const minusBtn = fixture.nativeElement.querySelector(
-      'button[aria-label="Diminuir Arroz Agulhinha Tipo 1"]',
+      'button[aria-label="Diminuir Arroz Agulhinha Tipo 1"]'
     ) as HTMLButtonElement;
 
     expect(minusBtn.disabled).toBeFalse();
     minusBtn.click();
     expect(decrementCalled).toBeTrue();
+  });
+
+  it('should emit quantityChange when kitchen leader types directly in the input', () => {
+    let emittedQty = -1;
+    component.quantityChange.subscribe((qty) => {
+      emittedQty = qty;
+    });
+
+    const inputEl = fixture.nativeElement.querySelector(
+      'input[type="number"]'
+    ) as HTMLInputElement;
+
+    inputEl.value = '25';
+    inputEl.dispatchEvent(new Event('input'));
+
+    expect(emittedQty).toBe(25);
   });
 });

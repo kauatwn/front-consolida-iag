@@ -39,7 +39,7 @@ import { CatalogProduct } from '../../catalog/product.model';
           </div>
         </div>
 
-        <!-- Unit Pill (Kg, Litro, Pacote, Gramas, Unidade) -->
+        <!-- Unit Pill -->
         <span
           class="bg-surface-container-high px-space-sm font-label-badge text-caption text-on-surface-variant shrink-0 rounded-full py-1 font-bold"
         >
@@ -54,7 +54,11 @@ import { CatalogProduct } from '../../catalog/product.model';
           Quantidade:
         </span>
 
-        <div class="gap-space-sm flex items-center">
+        <div
+          role="group"
+          [attr.aria-label]="'Quantidade de ' + product().name"
+          class="gap-space-sm flex items-center"
+        >
           <button
             type="button"
             [attr.aria-label]="'Diminuir ' + product().name"

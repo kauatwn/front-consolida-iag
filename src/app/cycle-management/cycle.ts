@@ -5,7 +5,7 @@ import { environment } from '../../environments/environment';
 import { WeeklyCycle } from './cycle.model';
 
 @Service()
-export class CycleService {
+export class Cycle {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/cycles`;
 

@@ -5,7 +5,7 @@ import { environment } from '../../environments/environment';
 import { CatalogProduct, CategoryGroup, ProductCategory, UnitMeasure } from './product.model';
 
 @Service()
-export class CatalogService {
+export class Catalog {
   private readonly http = inject(HttpClient);
   private readonly apiUrl = `${environment.apiUrl}/products`;
 
@@ -18,16 +18,13 @@ export class CatalogService {
   private readonly _error = signal<string | null>(null);
   readonly error = this._error.asReadonly();
 
-  /**
-   * Computed list of products grouped by category in display order
-   */
   readonly groupedProducts = computed<CategoryGroup[]>(() => {
     const activeProducts = this._products().filter((p) => p.active !== false);
     const groupsMap = new Map<string, CategoryGroup>();
 
     for (const prod of activeProducts) {
       const catKey = prod.category || ProductCategory.OUTROS;
-      const catName = prod.categoryDisplayName || 'Outros Itens';
+      const catName = prod.categoryDisplayName || 'Itens Gerais';
 
       if (!groupsMap.has(catKey)) {
         groupsMap.set(catKey, {
@@ -43,10 +40,6 @@ export class CatalogService {
     return Array.from(groupsMap.values());
   });
 
-  /**
-   * Fetches the products from GET /api/v1/products.
-   * If backend is unreachable, falls back to institutional default catalog.
-   */
   listCatalogProducts(): Observable<CatalogProduct[]> {
     this._loading.set(true);
     this._error.set(null);
@@ -75,11 +68,15 @@ export class CatalogService {
       return this.getDefaultMockCatalog();
     }
 
-    return items.map((item) => ({
-      ...item,
-      unitMeasure: this.normalizeUnit(item.unitMeasure),
-      categoryDisplayName: item.categoryDisplayName ?? this.formatCategoryName(item.category),
-    }));
+    return items.map((item) => {
+      const category = item.category || ProductCategory.OUTROS;
+      return {
+        ...item,
+        category,
+        unitMeasure: this.normalizeUnit(item.unitMeasure),
+        categoryDisplayName: item.categoryDisplayName ?? this.formatCategoryName(category),
+      };
+    });
   }
 
   private normalizeUnit(unit?: string): string {
@@ -87,6 +84,7 @@ export class CatalogService {
     if (u === 'KG' || u === 'QUILO') return UnitMeasure.KG;
     if (u === 'L' || u === 'LITRO' || u === 'LITROS' || u === 'ML') return UnitMeasure.LITRO;
     if (u.includes('PCT') || u.includes('PACOTE')) return UnitMeasure.PACOTE;
+    if (u === 'CX' || u === 'CAIXA' || u === 'CAIXAS') return 'Caixa';
     if (u === 'G' || u === 'GRAMAS' || u === 'GRAMA') return UnitMeasure.GRAMAS;
     if (u === 'UN' || u === 'UNIDADE' || u === 'UNIDADES') return UnitMeasure.UNIDADE;
     return unit || UnitMeasure.UNIDADE;
