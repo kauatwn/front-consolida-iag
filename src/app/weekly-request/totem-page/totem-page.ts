@@ -1,6 +1,7 @@
-import { Component, inject, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Component, effect, inject, input } from '@angular/core';
+import { LucideCircleCheck, LucideFileText, LucideUtensils } from '@lucide/angular';
 import { CatalogService } from '../../catalog/catalog.service';
+import { CategoryIcon } from '../../catalog/category-icon/category-icon';
 import { CycleService } from '../../cycle-management/cycle.service';
 import { CartSummaryBar } from '../cart-summary-bar/cart-summary-bar';
 import { ConfirmOrderModal } from '../confirm-order-modal/confirm-order-modal';
@@ -10,69 +11,41 @@ import { ServiceCode } from '../weekly-request.model';
 
 @Component({
   selector: 'app-totem-page',
-  imports: [ProductCard, CartSummaryBar, ConfirmOrderModal],
-  styles: `
-    :host {
-      display: block;
-      width: 100%;
-      min-height: 100vh;
-    }
-  `,
+  imports: [
+    ProductCard,
+    CartSummaryBar,
+    ConfirmOrderModal,
+    CategoryIcon,
+    LucideFileText,
+    LucideCircleCheck,
+    LucideUtensils,
+  ],
+  host: {
+    class: 'block min-h-screen w-full',
+  },
   template: `
     <div class="bg-surface font-body-md text-on-surface flex min-h-screen flex-col">
-      <!-- Fixed Top Header -->
-      <header
-        class="bg-surface/90 pt-safe fixed top-0 z-50 w-full shadow-[0_1px_8px_rgba(0,0,0,0.04)] backdrop-blur-xl"
-      >
-        <div class="gap-space-xs px-gutter-mobile flex flex-col justify-center py-2">
-          <!-- Title & User Profile Row -->
-          <div class="flex items-center justify-between">
-            <div class="pr-space-xs flex min-w-0 flex-col">
-              <div class="gap-space-xs flex items-center">
-                <span class="material-symbols-outlined text-secondary text-[22px]"
-                  >local_dining</span
-                >
-                <span
-                  class="font-headline-md text-headline-md text-primary truncate leading-none font-bold tracking-tight"
-                >
-                  Consolida IAG
-                </span>
-              </div>
-              <span class="font-caption text-caption text-on-surface-variant truncate">
-                Instituto Anchieta Grajaú
-              </span>
+      <!-- Main Scrollable Catalog Screen -->
+      <main class="px-gutter-mobile mx-auto flex w-full max-w-2xl flex-1 flex-col pt-6 pb-28">
+        <!-- Service Banner & Instructions -->
+        <header
+          class="mb-space-md bg-primary p-space-md text-on-primary flex flex-col gap-2 rounded-xl shadow-sm"
+        >
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <svg
+                lucideUtensils
+                [size]="22"
+                class="text-secondary-fixed shrink-0"
+                aria-hidden="true"
+              ></svg>
+              <h1 class="font-headline-md text-headline-md text-on-primary leading-tight font-bold">
+                {{ cartState.activeServiceDetail().fullName }}
+              </h1>
             </div>
 
-            <div class="gap-space-sm flex shrink-0 items-center">
-              <div
-                class="bg-primary text-on-primary flex h-8 w-8 items-center justify-center rounded-full"
-              >
-                <span class="material-symbols-outlined text-[18px]">person</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Service Selector & Cycle Status Row -->
-          <div class="gap-space-xs flex items-center justify-between">
-            <!-- Service Cost Center Pills (CEI / CCA / CJ) -->
-            <div class="bg-surface-container-high flex items-center gap-1 rounded-full p-0.5">
-              @for (svc of serviceOptions; track svc) {
-                <button
-                  type="button"
-                  (click)="selectService(svc)"
-                  [class.bg-primary]="cartState.selectedService() === svc"
-                  [class.text-on-primary]="cartState.selectedService() === svc"
-                  [class.text-on-surface-variant]="cartState.selectedService() !== svc"
-                  class="font-caption text-caption flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-0.5 font-bold transition-all active:scale-95"
-                >
-                  <span>{{ svc }}</span>
-                </button>
-              }
-            </div>
-
-            <!-- Active Cycle Badge -->
             <div
-              class="bg-tertiary-fixed px-space-xs text-on-tertiary-fixed flex items-center gap-1.5 rounded-full py-0.5"
+              class="bg-tertiary-fixed text-on-tertiary-fixed flex items-center gap-1.5 rounded-full px-3 py-1"
             >
               <span class="bg-tertiary-container h-2 w-2 animate-pulse rounded-full"></span>
               <span class="font-caption text-caption leading-none font-bold whitespace-nowrap">
@@ -80,76 +53,34 @@ import { ServiceCode } from '../weekly-request.model';
               </span>
             </div>
           </div>
-        </div>
-      </header>
 
-      <!-- Main Scrollable Catalog Screen -->
-      <main class="px-gutter-mobile relative flex w-full flex-1 flex-col pt-28 pb-36">
-        <!-- Hero / Instructions Banner -->
-        <div class="mb-space-md gap-space-sm flex flex-col">
-          <div
-            class="gap-space-md bg-primary p-space-md text-on-primary flex items-center rounded-xl shadow-md"
-          >
-            <div
-              class="bg-secondary text-on-secondary flex h-12 w-12 shrink-0 items-center justify-center rounded-full shadow-sm"
-            >
-              <span class="material-symbols-outlined text-[28px]">soup_kitchen</span>
-            </div>
-            <div class="flex min-w-0 flex-col">
-              <span
-                class="font-headline-md text-headline-md text-on-primary leading-tight font-bold"
-              >
-                Cardápio &amp; Pedidos ({{ cartState.activeServiceDetail().acronym }})
-              </span>
-              <p class="font-body-md text-caption text-on-primary/90 mt-0.5 leading-snug">
-                Selecione as quantidades para a semana. Toque no <strong>+</strong> ou
-                <strong>−</strong> para ajustar com facilidade.
-              </p>
-            </div>
-          </div>
+          <p class="font-body-md text-caption text-on-primary/90 leading-snug">
+            Selecione as quantidades para a semana. Toque em <strong>+</strong> ou
+            <strong>&ndash;</strong> para ajustar de 1 em 1, ou
+            <strong>toque no número</strong> para digitar manualmente.
+          </p>
+        </header>
 
-          <div class="px-space-xs flex items-center justify-between">
-            <div class="flex items-center gap-1.5">
-              <span class="bg-secondary h-2.5 w-2.5 animate-pulse rounded-full"></span>
-              <span
-                class="font-caption text-caption text-on-surface-variant tracking-wider uppercase"
-              >
-                Itens Essenciais Homologados
-              </span>
-            </div>
-            <span
-              class="font-caption text-caption text-secondary flex items-center gap-1 font-bold"
-            >
-              <span class="material-symbols-outlined text-[16px]">touch_app</span> Modo Rápido
-              Cozinha
-            </span>
-          </div>
-        </div>
-
-        <!-- Product Groups by Category (Continuous Scroll) -->
+        <!-- Product Groups by Category -->
         <div class="gap-space-md flex flex-col" id="catalog-list">
           @for (group of catalogService.groupedProducts(); track group.category) {
             <section class="gap-space-sm flex flex-col">
-              <!-- Category Header Divider -->
               <div class="my-space-xs gap-space-xs px-space-xs flex items-center">
-                <span class="material-symbols-outlined text-secondary text-[20px]">
-                  {{ group.iconName }}
-                </span>
-                <span
+                <app-category-icon [category]="group.category" [size]="20" class="text-secondary" />
+                <h2
                   class="font-caption text-caption text-on-surface-variant font-bold tracking-wider uppercase"
                 >
                   {{ group.categoryDisplayName }}
-                </span>
+                </h2>
               </div>
 
-              <!-- Cards in Category -->
               <div class="gap-space-sm flex flex-col">
                 @for (product of group.products; track product.id) {
                   <app-product-card
                     [product]="product"
                     [quantity]="cartState.getQuantity(product.id)"
-                    (increment)="cartState.increment(product.id, product.step ?? 1)"
-                    (decrement)="cartState.decrement(product.id, product.step ?? 1)"
+                    (increment)="cartState.increment(product.id)"
+                    (decrement)="cartState.decrement(product.id)"
                     (quantityChange)="cartState.setQuantity(product.id, $event)"
                   />
                 }
@@ -160,39 +91,41 @@ import { ServiceCode } from '../weekly-request.model';
               <div
                 class="p-space-lg text-on-surface-variant flex flex-col items-center justify-center"
               >
-                <span class="material-symbols-outlined animate-spin text-[36px]"
-                  >progress_activity</span
-                >
-                <span class="mt-space-xs font-body-md text-body-md"
-                  >Carregando catálogo de insumos...</span
-                >
+                <span class="font-body-md text-body-md">Carregando catálogo de insumos...</span>
               </div>
             }
           }
         </div>
 
         <!-- Free-text Observation Box (RN-02.3) -->
-        <div
+        <section
           class="mt-space-md gap-space-xs bg-surface-container-low p-space-md flex flex-col rounded-xl shadow-sm"
         >
-          <div class="gap-space-xs text-primary flex items-center">
-            <span class="material-symbols-outlined text-[22px]">edit_note</span>
-            <span class="font-headline-md text-body-lg text-on-surface font-bold">
-              Observações ou itens fora do catálogo
-            </span>
-          </div>
+          <label
+            for="request-observation"
+            class="gap-space-xs font-headline-md text-body-lg text-on-surface flex items-center font-bold"
+          >
+            <svg
+              lucideFileText
+              [size]="20"
+              class="text-secondary shrink-0"
+              aria-hidden="true"
+            ></svg>
+            <span>Observações ou itens fora do catálogo</span>
+          </label>
           <p class="font-caption text-caption text-on-surface-variant">
             Caso falte algo essencial que não está na lista acima (ex: temperos específicos, itens
             de dieta especial ou emergência de limpeza).
           </p>
           <textarea
+            id="request-observation"
             rows="3"
             (input)="onObservationInput($event)"
             [value]="cartState.observation()"
             placeholder="Precisa de algum item emergencial ou diferente da lista? Descreva aqui com a quantidade aproximada..."
-            class="mt-space-xs bg-surface-container-lowest p-space-sm font-body-md text-body-md text-on-surface w-full resize-none rounded-lg shadow-inner focus:outline-none"
+            class="mt-space-xs bg-surface-container-lowest p-space-sm font-body-md text-body-md text-on-surface focus:ring-secondary/40 w-full resize-none rounded-lg shadow-inner focus:ring-2 focus:outline-none"
           ></textarea>
-        </div>
+        </section>
       </main>
 
       <!-- Sticky Cart Summary Bar -->
@@ -204,80 +137,42 @@ import { ServiceCode } from '../weekly-request.model';
       <!-- Floating Success Toast Notification -->
       @if (cartState.toastSuccess()) {
         <div
-          class="gap-space-xs bg-tertiary px-space-md py-space-sm text-on-tertiary fixed top-28 left-1/2 z-50 flex -translate-x-1/2 items-center rounded-full shadow-2xl transition-all duration-300"
+          role="status"
+          class="gap-space-xs bg-tertiary px-space-md py-space-sm text-on-tertiary fixed top-6 left-1/2 z-50 flex -translate-x-1/2 items-center rounded-full shadow-2xl transition-all duration-300"
         >
-          <span class="material-symbols-outlined text-tertiary-fixed text-[22px]">verified</span>
+          <svg
+            lucideCircleCheck
+            [size]="22"
+            class="text-tertiary-fixed shrink-0"
+            aria-hidden="true"
+          ></svg>
           <span class="font-headline-md text-body-md font-bold">
             {{ cartState.toastSuccess() }}
           </span>
         </div>
       }
-
-      <!-- Fixed Bottom Navigation (Totem Navigation) -->
-      <nav
-        class="bg-surface/90 pb-safe fixed bottom-0 z-40 w-full shadow-[0_-2px_10px_rgba(0,0,0,0.05)] backdrop-blur-xl"
-      >
-        <div class="px-space-xs flex h-16 items-center justify-around">
-          <button
-            type="button"
-            aria-current="page"
-            class="text-primary flex min-h-[48px] min-w-14 cursor-pointer flex-col items-center justify-center gap-0.5 font-bold transition-colors"
-          >
-            <span class="material-symbols-outlined text-[22px]">receipt_long</span>
-            <span class="font-caption text-caption leading-none">Pedidos</span>
-          </button>
-          <button
-            type="button"
-            class="text-on-surface-variant hover:text-primary flex min-h-[48px] min-w-14 cursor-pointer flex-col items-center justify-center gap-0.5 transition-colors"
-          >
-            <span class="material-symbols-outlined text-[22px]">inventory_2</span>
-            <span class="font-caption text-caption leading-none">Estoque</span>
-          </button>
-          <button
-            type="button"
-            (click)="cartState.openConfirmModal()"
-            class="text-on-surface-variant hover:text-primary flex min-h-[48px] min-w-14 cursor-pointer flex-col items-center justify-center gap-0.5 transition-colors"
-          >
-            <span class="material-symbols-outlined text-[22px]">shopping_basket</span>
-            <span class="font-caption text-caption leading-none">Cesta</span>
-          </button>
-          <button
-            type="button"
-            class="text-on-surface-variant hover:text-primary flex min-h-[48px] min-w-14 cursor-pointer flex-col items-center justify-center gap-0.5 transition-colors"
-          >
-            <span class="material-symbols-outlined text-[22px]">history_edu</span>
-            <span class="font-caption text-caption leading-none">Entregas</span>
-          </button>
-        </div>
-      </nav>
     </div>
   `,
 })
-export class TotemPage implements OnInit {
+export class TotemPage {
   protected readonly catalogService = inject(CatalogService);
   protected readonly cycleService = inject(CycleService);
   protected readonly cartState = inject(TotemCartState);
-  private readonly route = inject(ActivatedRoute);
-  private readonly router = inject(Router);
 
-  protected readonly serviceOptions: ServiceCode[] = ['CEI', 'CCA', 'CJ'];
+  readonly serviceCode = input<string>();
 
-  ngOnInit(): void {
-    // Load products
+  constructor() {
     this.catalogService.listCatalogProducts().subscribe();
 
-    // Monitor route params for /pedido/:serviceCode
-    this.route.paramMap.subscribe((params) => {
-      const code = params.get('serviceCode')?.toUpperCase();
-      if (code && (code === 'CEI' || code === 'CCA' || code === 'CJ')) {
+    effect(() => {
+      const code = this.serviceCode()?.toUpperCase();
+      if (
+        code &&
+        (code === ServiceCode.CEI || code === ServiceCode.CCA || code === ServiceCode.CJ)
+      ) {
         this.cartState.setService(code as ServiceCode);
       }
     });
-  }
-
-  protected selectService(code: ServiceCode): void {
-    this.cartState.setService(code);
-    this.router.navigate(['/pedido', code.toLowerCase()], { replaceUrl: true });
   }
 
   protected onObservationInput(event: Event): void {

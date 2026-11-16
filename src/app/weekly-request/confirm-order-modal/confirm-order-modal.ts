@@ -1,19 +1,34 @@
+import { HttpStatusCode } from '@angular/common/http';
 import { Component, computed, inject } from '@angular/core';
+import {
+  LucideClipboardCheck,
+  LucideLoader,
+  LucideSend,
+  LucideTriangleExclamationPoint,
+  LucideX,
+} from '@lucide/angular';
 import { CatalogService } from '../../catalog/catalog.service';
 import { TotemCartState } from '../totem-cart.state';
 import { RequestConflictError, WeeklyRequestService } from '../weekly-request.service';
-import { HttpStatusCode } from '@angular/common/http';
 
 @Component({
-  imports: [],
   selector: 'app-confirm-order-modal',
-  styles: `
-    :host {
-      display: contents;
-    }
-  `,
+  imports: [
+    LucideClipboardCheck,
+    LucideX,
+    LucideTriangleExclamationPoint,
+    LucideSend,
+    LucideLoader,
+  ],
+  host: {
+    class: 'contents',
+  },
   template: `
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="confirm-modal-title"
+      [inert]="!cartState.isConfirmModalOpen()"
       class="p-gutter-mobile fixed inset-0 z-50 flex items-end justify-center transition-all duration-300 sm:items-center"
       [class.opacity-0]="!cartState.isConfirmModalOpen()"
       [class.pointer-events-none]="!cartState.isConfirmModalOpen()"
@@ -31,22 +46,26 @@ import { HttpStatusCode } from '@angular/common/http';
         <div class="flex items-center justify-between">
           <div class="gap-space-xs flex items-center">
             <div
-              class="bg-tertiary-fixed text-on-tertiary-fixed flex h-9 w-9 items-center justify-center rounded-full"
+              class="bg-tertiary-fixed text-on-tertiary-fixed flex size-9 shrink-0 items-center justify-center rounded-full"
             >
-              <span class="material-symbols-outlined text-[22px]">assignment_turned_in</span>
+              <svg lucideClipboardCheck [size]="20" aria-hidden="true"></svg>
             </div>
-            <h2 class="font-headline-md text-headline-md text-primary font-bold">
+            <h2
+              id="confirm-modal-title"
+              class="font-headline-md text-headline-md text-primary font-bold"
+            >
               Confirmar Envio
             </h2>
           </div>
+
           <button
             type="button"
             aria-label="Fechar janela"
             (click)="onClose()"
             [disabled]="cartState.isSubmitting()"
-            class="text-on-surface-variant hover:bg-surface-container-high flex h-10 w-10 cursor-pointer items-center justify-center rounded-full transition-colors active:scale-95 disabled:opacity-40"
+            class="text-on-surface-variant hover:bg-surface-container-high flex size-10 shrink-0 cursor-pointer items-center justify-center rounded-full transition-colors active:scale-95 disabled:opacity-40"
           >
-            <span class="material-symbols-outlined">close</span>
+            <svg lucideX [size]="20" aria-hidden="true"></svg>
           </button>
         </div>
 
@@ -77,9 +96,9 @@ import { HttpStatusCode } from '@angular/common/http';
                 <span class="text-on-surface truncate pr-2 font-bold">{{ item.product.name }}</span>
                 <span class="font-label-numeric text-primary shrink-0 font-bold">
                   {{ item.quantity }}
-                  <small class="font-caption text-on-surface-variant font-normal">{{
-                    item.product.unitMeasure
-                  }}</small>
+                  <small class="font-caption text-on-surface-variant font-normal">
+                    {{ item.product.unitMeasure }}
+                  </small>
                 </span>
               </div>
             } @empty {
@@ -105,9 +124,15 @@ import { HttpStatusCode } from '@angular/common/http';
         <!-- Conflict or Error Banner (RN-02.4) -->
         @if (cartState.conflictError()) {
           <div
+            role="alert"
             class="bg-error-container p-space-sm text-on-error-container flex items-start gap-2 rounded-xl text-left shadow-sm"
           >
-            <span class="material-symbols-outlined text-error text-[20px]">warning</span>
+            <svg
+              lucideTriangleExclamationPoint
+              [size]="20"
+              class="text-error mt-0.5 shrink-0"
+              aria-hidden="true"
+            ></svg>
             <div class="font-caption text-caption leading-tight">
               <strong class="font-bold">Aviso de Regra de Negócio:</strong>
               <p class="mt-0.5">{{ cartState.conflictError() }}</p>
@@ -121,16 +146,14 @@ import { HttpStatusCode } from '@angular/common/http';
             type="button"
             (click)="onSubmit()"
             [disabled]="!cartState.canSubmit() || selectedItems().length === 0"
-            class="bg-primary font-headline-md text-body-md text-on-primary flex min-h-14 w-full cursor-pointer items-center justify-center gap-2 rounded-xl font-bold tracking-wider uppercase shadow-lg transition-transform active:scale-98 disabled:cursor-not-allowed disabled:opacity-50"
+            class="bg-primary font-headline-md text-body-md text-on-primary flex min-h-14 w-full cursor-pointer items-center justify-center gap-2 rounded-xl font-bold tracking-wider uppercase shadow-lg transition-transform active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
           >
             @if (cartState.isSubmitting()) {
-              <span class="material-symbols-outlined animate-spin text-[22px]"
-                >progress_activity</span
-              >
+              <svg lucideLoader [size]="20" class="animate-spin" aria-hidden="true"></svg>
               <span>Registrando Solicitação...</span>
             } @else {
               <span>Confirmar e Enviar Pedido</span>
-              <span class="material-symbols-outlined text-[22px]">send</span>
+              <svg lucideSend [size]="20" aria-hidden="true"></svg>
             }
           </button>
 
@@ -138,7 +161,7 @@ import { HttpStatusCode } from '@angular/common/http';
             type="button"
             (click)="onClose()"
             [disabled]="cartState.isSubmitting()"
-            class="font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high flex min-h-[48px] w-full cursor-pointer items-center justify-center rounded-lg bg-transparent transition-colors active:scale-98 disabled:opacity-40"
+            class="font-body-md text-body-md text-on-surface-variant hover:bg-surface-container-high flex min-h-12 w-full cursor-pointer items-center justify-center rounded-lg bg-transparent transition-colors active:scale-[0.98] disabled:opacity-40"
           >
             Voltar e Revisar Itens
           </button>
@@ -152,9 +175,6 @@ export class ConfirmOrderModal {
   private readonly weeklyRequestService = inject(WeeklyRequestService);
   private readonly catalogService = inject(CatalogService);
 
-  /**
-   * Computed list of cart items with product info
-   */
   protected readonly selectedItems = computed(() => {
     return this.cartState.getSelectedItemsSummary(this.catalogService.products());
   });
