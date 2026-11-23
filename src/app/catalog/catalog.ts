@@ -115,7 +115,6 @@ export class Catalog {
         unitMeasure: UnitMeasure.KG,
         category: ProductCategory.GRAOS_E_CEREAIS,
         categoryDisplayName: 'Grãos e Cereais',
-        description: 'Fardo 5kg',
         active: true,
       },
       {
@@ -124,7 +123,6 @@ export class Catalog {
         unitMeasure: UnitMeasure.KG,
         category: ProductCategory.GRAOS_E_CEREAIS,
         categoryDisplayName: 'Grãos e Cereais',
-        description: 'Pacote 1kg',
         active: true,
       },
       {
@@ -133,7 +131,6 @@ export class Catalog {
         unitMeasure: UnitMeasure.PACOTE,
         category: ProductCategory.GRAOS_E_CEREAIS,
         categoryDisplayName: 'Grãos e Cereais',
-        description: 'Pacote 500g',
         active: true,
       },
       {
@@ -142,7 +139,6 @@ export class Catalog {
         unitMeasure: UnitMeasure.LITRO,
         category: ProductCategory.GRAOS_E_CEREAIS,
         categoryDisplayName: 'Grãos e Cereais',
-        description: 'Garrafa 900ml',
         active: true,
       },
       {
@@ -151,7 +147,6 @@ export class Catalog {
         unitMeasure: UnitMeasure.KG,
         category: ProductCategory.GRAOS_E_CEREAIS,
         categoryDisplayName: 'Grãos e Cereais',
-        description: 'Pacote 1kg',
         active: true,
       },
       {
@@ -160,7 +155,6 @@ export class Catalog {
         unitMeasure: UnitMeasure.KG,
         category: ProductCategory.GRAOS_E_CEREAIS,
         categoryDisplayName: 'Grãos e Cereais',
-        description: 'Pacote 1kg',
         active: true,
       },
       {
@@ -169,7 +163,6 @@ export class Catalog {
         unitMeasure: UnitMeasure.KG,
         category: ProductCategory.GRAOS_E_CEREAIS,
         categoryDisplayName: 'Grãos e Cereais',
-        description: 'Pacote 1kg',
         active: true,
       },
       {
@@ -178,7 +171,6 @@ export class Catalog {
         unitMeasure: UnitMeasure.LITRO,
         category: ProductCategory.LATICINIOS_MATINAIS,
         categoryDisplayName: 'Laticínios e Matinais',
-        description: 'Caixa 1L',
         active: true,
       },
       {
@@ -187,7 +179,6 @@ export class Catalog {
         unitMeasure: UnitMeasure.UNIDADE,
         category: ProductCategory.HIGIENE_COZINHA,
         categoryDisplayName: 'Higiene & Limpeza da Cozinha',
-        description: 'Frasco 500ml',
         active: true,
       },
       {
@@ -196,7 +187,6 @@ export class Catalog {
         unitMeasure: UnitMeasure.LITRO,
         category: ProductCategory.HIGIENE_COZINHA,
         categoryDisplayName: 'Higiene & Limpeza da Cozinha',
-        description: 'Frasco 1L',
         active: true,
       },
       {
@@ -205,7 +195,6 @@ export class Catalog {
         unitMeasure: UnitMeasure.PACOTE,
         category: ProductCategory.HIGIENE_COZINHA,
         categoryDisplayName: 'Higiene & Limpeza da Cozinha',
-        description: 'Pacote c/ 3 un',
         active: true,
       },
     ];
