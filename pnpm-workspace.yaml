@@ -2,7 +2,9 @@ packages:
   - '.'
 
 allowBuilds:
+  '@firebase/util': true
   '@parcel/watcher': false
   esbuild: false
   lmdb: false
   msgpackr-extract: false
+  protobufjs: true
