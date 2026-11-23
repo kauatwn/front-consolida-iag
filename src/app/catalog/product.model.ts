@@ -1,31 +1,44 @@
 export const ProductCategory = {
   GRAOS_E_CEREAIS: 'GRAOS_E_CEREAIS',
-  HORTIFRUTI_FRESCOS: 'HORTIFRUTI_FRESCOS',
   PROTEINAS_CARNES: 'PROTEINAS_CARNES',
-  LATICINIOS_MATINAIS: 'LATICINIOS_MATINAIS',
-  HIGIENE_COZINHA: 'HIGIENE_COZINHA',
-  OUTROS: 'OUTROS',
+  HORTIFRUTI_FRESCOS: 'HORTIFRUTI_FRESCOS',
+  LATICINIOS_DERIVADOS: 'LATICINIOS_DERIVADOS',
+  MERCEARIA_PANIFICACAO: 'MERCEARIA_PANIFICACAO',
 } as const;
 
 export type ProductCategory = (typeof ProductCategory)[keyof typeof ProductCategory];
 
+export const CATEGORY_LABELS: Record<string, string> = {
+  GRAOS_E_CEREAIS: 'Grãos e Cereais',
+  PROTEINAS_CARNES: 'Proteínas e Carnes',
+  HORTIFRUTI_FRESCOS: 'Hortifrúti e Frescos',
+  LATICINIOS_DERIVADOS: 'Laticínios e Derivados',
+  MERCEARIA_PANIFICACAO: 'Mercearia e Panificação',
+};
+
 export const UnitMeasure = {
-  KG: 'Kg',
-  LITRO: 'Litro',
-  PACOTE: 'Pacote',
-  GRAMAS: 'Gramas',
-  UNIDADE: 'Unidade',
+  KG: 'KG',
+  L: 'L',
+  UN: 'UN',
+  PCT: 'PCT',
 } as const;
 
 export type UnitMeasure = (typeof UnitMeasure)[keyof typeof UnitMeasure];
+
+export const UNIT_MEASURE_LABELS: Record<string, string> = {
+  KG: 'Kg',
+  L: 'Litro',
+  UN: 'Unidade',
+  PCT: 'Pacote',
+};
 
 export interface CatalogProduct {
   id: string;
   name: string;
   unitMeasure: UnitMeasure | string;
   category: ProductCategory | string;
-  categoryDisplayName: string;
-  active: boolean;
+  categoryDisplayName?: string;
+  active?: boolean;
 }
 
 export interface CategoryGroup {
