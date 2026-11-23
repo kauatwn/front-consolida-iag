@@ -109,8 +109,9 @@ export class TotemCartState {
     const sanitized = Math.max(0, Math.floor(quantity));
     this._quantities.update((prev) => {
       if (sanitized === 0) {
-        const { [productId]: _, ...rest } = prev;
-        return rest;
+        const next = { ...prev };
+        delete next[productId];
+        return next;
       }
       return { ...prev, [productId]: sanitized };
     });

@@ -92,9 +92,9 @@ import { CycleClosedError, RequestConflictError, WeeklyRequest } from '../weekly
                 <div
                   class="bg-surface-container-low px-space-xs font-body-md text-body-md flex items-center justify-between rounded-lg py-2"
                 >
-                  <span class="text-on-surface truncate pr-2 font-bold">{{
-                    item.product.name
-                  }}</span>
+                  <div class="flex min-w-0 flex-col pr-2">
+                    <span class="text-on-surface truncate font-bold">{{ item.product.name }}</span>
+                  </div>
                   <span class="font-label-numeric text-primary shrink-0 font-bold">
                     {{ item.quantity }}
                     <small class="font-caption text-on-surface-variant font-normal">
