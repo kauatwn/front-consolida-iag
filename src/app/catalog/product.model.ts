@@ -26,7 +26,6 @@ export interface CatalogProduct {
   category: ProductCategory | string;
   categoryDisplayName: string;
   active: boolean;
-  description?: string; // Short display description e.g. "500g", "1L", "1kg", "Fardo 5kg"
 }
 
 export interface CategoryGroup {
