@@ -62,6 +62,10 @@
   --color-outline: #74777e;
   --color-outline-variant: #c3c6ce;
 
+  /* New tokens */
+  --color-accent-soft: #fdf6f2;
+  --color-outline-subtle: #e2e5ea;
+
   --color-error: #ba1a1a;
   --color-on-error: #ffffff;
   --color-error-container: #ffdad6;
@@ -80,9 +84,13 @@
 }
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
   html,
   body {
-    width: 100vw;
+    width: 100%;
     margin: 0;
     padding: 0;
     font-family: var(--font-sans);
@@ -90,18 +98,46 @@
     color: var(--color-on-surface);
     overscroll-behavior: none;
     -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  body {
+    touch-action: pan-y;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   .pb-safe {
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-bottom: max(1rem, env(safe-area-inset-bottom, 16px));
   }
 
   .pt-safe {
-    padding-top: env(safe-area-inset-top, 0px);
+    padding-top: max(0.75rem, env(safe-area-inset-top, 0px));
   }
 
   ::-webkit-scrollbar {
     display: none;
+    width: 0;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
 }
 
