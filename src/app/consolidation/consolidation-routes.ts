@@ -6,4 +6,9 @@ export const consolidationRoutes: Routes = [
     loadComponent: () =>
       import('./consolidation-page/consolidation-page').then((m) => m.ConsolidationPage),
   },
+  {
+    path: ':cycleId',
+    loadComponent: () =>
+      import('./consolidation-page/consolidation-page').then((m) => m.ConsolidationPage),
+  },
 ];

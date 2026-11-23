@@ -1,8 +1,10 @@
 import { Component, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { LucideInfo, LucideLock, LucideRefreshCw } from '@lucide/angular';
-import { CycleStatus } from '../cycle.model';
+import { Auth } from '../../core/auth/auth';
 import { Cycle } from '../cycle';
+import { CycleStatus } from '../cycle.model';
+import { resolveUserHomeCommands } from '../../core/auth/auth-redirect';
 
 @Component({
   selector: 'app-cycle-closed-page',
@@ -85,6 +87,7 @@ import { Cycle } from '../cycle';
 export class CycleClosedPage {
   private readonly router = inject(Router);
   private readonly cycleService = inject(Cycle);
+  private readonly auth = inject(Auth);
 
   protected readonly isChecking = signal<boolean>(false);
   protected readonly checkMessage = signal<string | null>(null);
@@ -97,7 +100,7 @@ export class CycleClosedPage {
       next: (cycle) => {
         this.isChecking.set(false);
         if (cycle && cycle.status === CycleStatus.OPEN) {
-          this.router.navigate(['/pedido/cei']);
+          this.router.navigate(resolveUserHomeCommands(this.auth.currentUser()));
         } else {
           this.checkMessage.set(
             'O ciclo semanal continua encerrado. Aguarde a gestão de compras abrir um novo ciclo.',

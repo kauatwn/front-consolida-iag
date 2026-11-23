@@ -11,6 +11,7 @@ import {
   LucideUtensils,
 } from '@lucide/angular';
 import { Auth } from '../auth';
+import { resolveUserHomeCommands } from '../auth-redirect';
 import { UserSession } from '../user-session';
 
 @Component({
@@ -131,11 +132,11 @@ import { UserSession } from '../user-session';
             <button
               type="submit"
               [disabled]="isLoading()"
-              class="bg-primary text-on-primary hover:bg-primary/95 mt-2 flex cursor-pointer items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold shadow-md transition-all active:scale-95 disabled:cursor-not-allowed disabled:opacity-50"
+              class="bg-primary hover:bg-primary/90 text-on-primary focus:ring-secondary/40 mt-2 flex min-h-11 w-full cursor-pointer items-center justify-center gap-2 rounded-xl text-sm font-bold shadow-md transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60"
             >
               @if (isLoading()) {
                 <svg lucideLoader [size]="18" class="animate-spin" aria-hidden="true"></svg>
-                <span>Autenticando...</span>
+                <span>Acessando...</span>
               } @else {
                 <svg lucideLogIn [size]="18" aria-hidden="true"></svg>
                 <span>Entrar</span>
@@ -143,6 +144,11 @@ import { UserSession } from '../user-session';
             </button>
           </form>
         </div>
+
+        <!-- Hint Footer -->
+        <p class="text-on-surface-variant mt-6 text-center text-xs">
+          Em caso de dificuldades de acesso, contate o setor de compras ou a gestão.
+        </p>
       </div>
     </div>
   `,
@@ -169,23 +175,12 @@ export class LoginPage {
     this.auth.login(this.email, this.password).subscribe({
       next: (session: UserSession) => {
         this.isLoading.set(false);
-        this.redirectAfterLogin(session);
+        this.router.navigate(resolveUserHomeCommands(session));
       },
       error: (err: Error) => {
         this.isLoading.set(false);
         this.errorMessage.set(err.message || 'Falha na autenticação.');
       },
     });
-  }
-
-  private redirectAfterLogin(session: UserSession): void {
-    if (session.role === 'BUYER') {
-      this.router.navigate(['/consolidacao']);
-      return;
-    }
-
-    if (session.role === 'KITCHEN_LEADER' && session.serviceCode) {
-      this.router.navigate(['/pedido', session.serviceCode.toLowerCase()]);
-    }
   }
 }
