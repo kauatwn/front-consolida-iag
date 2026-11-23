@@ -1,15 +1,19 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth-guard';
 import { buyerGuard } from './core/auth/buyer-guard';
+import { rootRedirectGuard } from './core/auth/root-redirect-guard';
+import { unauthGuard } from './core/auth/unauth-guard';
 
 export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'login',
+    canActivate: [rootRedirectGuard],
+    children: [],
   },
   {
     path: 'login',
+    canActivate: [unauthGuard],
     loadComponent: () => import('./core/auth/login-page/login-page').then((m) => m.LoginPage),
   },
   {

@@ -1,5 +1,6 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router, UrlTree } from '@angular/router';
+import { resolveUserHomeCommands } from './auth-redirect';
 import { Auth } from './auth';
 
 export const buyerGuard: CanActivateFn = (): boolean | UrlTree => {
@@ -12,9 +13,5 @@ export const buyerGuard: CanActivateFn = (): boolean | UrlTree => {
     return true;
   }
 
-  if (currentUser?.role === 'KITCHEN_LEADER' && currentUser.serviceCode) {
-    return router.createUrlTree(['/pedido', currentUser.serviceCode.toLowerCase()]);
-  }
-
-  return router.createUrlTree(['/login']);
+  return router.createUrlTree(resolveUserHomeCommands(currentUser));
 };

@@ -41,6 +41,10 @@ export interface CatalogProduct {
   active?: boolean;
 }
 
+export type ActiveProductSummary = Pick<CatalogProduct, 'id' | 'name' | 'unitMeasure' | 'category'>;
+
+export type CreateCatalogProduct = Omit<CatalogProduct, 'id' | 'categoryDisplayName'>;
+
 export interface CategoryGroup {
   category: string;
   categoryDisplayName: string;

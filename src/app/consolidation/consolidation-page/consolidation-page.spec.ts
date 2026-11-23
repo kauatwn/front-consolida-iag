@@ -18,13 +18,6 @@ describe('ConsolidationPage', () => {
     status: 'OPEN',
   };
 
-  const mockClosedCycle: WeeklyCycle = {
-    id: 'cycle-uuid-123',
-    startDate: '2026-11-02',
-    endDate: '2026-11-08',
-    status: 'CLOSED',
-  };
-
   const mockReport: ConsolidatedReport = {
     cycleId: 'cycle-uuid-123',
     generatedAt: '2026-11-03T10:00:00Z',
@@ -70,13 +63,13 @@ describe('ConsolidationPage', () => {
 
   const mockCycleService = {
     currentCycle: () => mockActiveCycle,
-    consultActiveCycle: jasmine.createSpy('consultActiveCycle').and.returnValue(of(mockActiveCycle)),
-    closeCycle: jasmine.createSpy('closeCycle').and.returnValue(of(mockClosedCycle)),
-    openCycle: jasmine.createSpy('openCycle').and.returnValue(of(mockActiveCycle)),
+    consultActiveCycle: () => of(mockActiveCycle),
   };
 
   const mockConsolidationService = {
-    getConsolidatedReport: jasmine.createSpy('getConsolidatedReport').and.returnValue(of(mockReport)),
+    getConsolidatedReport: jasmine
+      .createSpy('getConsolidatedReport')
+      .and.returnValue(of(mockReport)),
     getActiveConsolidatedReport: jasmine
       .createSpy('getActiveConsolidatedReport')
       .and.returnValue(of(mockReport)),
@@ -128,7 +121,9 @@ describe('ConsolidationPage', () => {
   });
 
   it('should filter items when typing in search input', () => {
-    const searchInput = fixture.nativeElement.querySelector('input[type="search"]') as HTMLInputElement;
+    const searchInput = fixture.nativeElement.querySelector(
+      'input[type="search"]',
+    ) as HTMLInputElement;
     searchInput.value = 'Leite';
     searchInput.dispatchEvent(new Event('input'));
     fixture.detectChanges();
@@ -136,15 +131,5 @@ describe('ConsolidationPage', () => {
     const text = fixture.nativeElement.textContent;
     expect(text).toContain('Leite Integral');
     expect(text).not.toContain('Arroz Agulhinha Tipo 1');
-  });
-
-  it('should have Encerrar Ciclo button when cycle is OPEN and call closeCycle on confirm', () => {
-    spyOn(window, 'confirm').and.returnValue(true);
-
-    const closeBtn = fixture.nativeElement.querySelector('button[aria-label="Encerrar ciclo de compras da semana"]') as HTMLButtonElement;
-    if (closeBtn) {
-      closeBtn.click();
-      expect(mockCycleService.closeCycle).toHaveBeenCalledWith('cycle-uuid-123');
-    }
   });
 });

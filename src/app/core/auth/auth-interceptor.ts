@@ -1,7 +1,6 @@
 import { HttpErrorResponse, HttpInterceptorFn, HttpStatusCode } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { from, switchMap, catchError } from 'rxjs';
-import { throwError } from 'rxjs/internal/observable/throwError';
+import { catchError, from, switchMap, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Token } from './token';
 

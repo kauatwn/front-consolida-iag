@@ -11,3 +11,8 @@ export interface WeeklyCycle {
   endDate: string;
   status: CycleStatus;
 }
+
+export interface OpenWeeklyCyclePayload {
+  startDate: string;
+  endDate: string;
+}

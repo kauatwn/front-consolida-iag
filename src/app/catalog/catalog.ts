@@ -6,7 +6,6 @@ import {
   CatalogProduct,
   CATEGORY_LABELS,
   CategoryGroup,
-  ProductCategory,
   UNIT_MEASURE_LABELS,
 } from './product.model';
 
