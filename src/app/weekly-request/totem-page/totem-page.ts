@@ -11,9 +11,12 @@ import {
 import {
   LucideCircleCheck,
   LucideFileText,
+  LucideLogOut,
   LucidePencilLine,
   LucideUtensils,
 } from '@lucide/angular';
+import { Router } from '@angular/router';
+import { Auth } from '../../core/auth/auth';
 import { Catalog } from '../../catalog/catalog';
 import { CategoryIcon } from '../../catalog/category-icon/category-icon';
 import { Cycle } from '../../cycle-management/cycle';
@@ -35,6 +38,7 @@ import { WeeklyRequest } from '../weekly-request';
     LucideCircleCheck,
     LucidePencilLine,
     LucideUtensils,
+    LucideLogOut,
   ],
   host: {
     class: 'block min-h-screen w-full',
@@ -75,6 +79,22 @@ import { WeeklyRequest } from '../weekly-request';
             <strong>&ndash;</strong> para ajustar de 1 em 1, ou
             <strong>toque no número</strong> para digitar manualmente.
           </p>
+
+          <div
+            class="border-on-primary/20 mt-1 flex items-center justify-between border-t pt-2 text-xs"
+          >
+            <span class="text-on-primary/85 truncate">
+              Conectado como: <strong class="text-on-primary">{{ auth.userName() }}</strong>
+            </span>
+            <button
+              type="button"
+              (click)="onLogout()"
+              class="hover:bg-on-primary/10 text-on-primary flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 font-semibold transition-colors"
+            >
+              <svg lucideLogOut [size]="14" aria-hidden="true"></svg>
+              <span>Sair</span>
+            </button>
+          </div>
         </header>
 
         <!-- Edit Mode Notice Banner (RN-02.6) -->
@@ -242,6 +262,13 @@ export class TotemPage {
   protected readonly cycleService = inject(Cycle);
   protected readonly cartState = inject(TotemCartState);
   private readonly weeklyRequestService = inject(WeeklyRequest);
+  protected readonly auth = inject(Auth);
+  private readonly router = inject(Router);
+
+  protected async onLogout(): Promise<void> {
+    await this.auth.logout();
+    this.router.navigate(['/login']);
+  }
 
   protected readonly activeCategory = signal<string>('all');
   readonly serviceCode = input<string>();

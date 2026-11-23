@@ -15,7 +15,7 @@ export interface ServiceDetail {
   fullName: string;
 }
 
-export const INSTITUTIONAL_SERVICES: Record<ServiceCode, ServiceDetail> = {
+export const INSTITUTIONAL_SERVICES = {
   [ServiceCode.CEI]: {
     code: ServiceCode.CEI,
     acronym: 'CEI',
@@ -34,7 +34,7 @@ export const INSTITUTIONAL_SERVICES: Record<ServiceCode, ServiceDetail> = {
     name: 'Centro de Juventude',
     fullName: 'CJ - Centro de Juventude',
   },
-};
+} satisfies Record<ServiceCode, ServiceDetail>;
 
 export interface RequestItemPayload {
   productId: string;

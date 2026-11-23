@@ -31,11 +31,6 @@ import { CatalogProduct } from '../../catalog/product.model';
             >
               {{ product().name }}
             </h3>
-            @if (product().description) {
-              <span class="font-caption text-caption text-on-surface-variant truncate font-medium">
-                {{ product().description }}
-              </span>
-            }
           </div>
         </div>
 
@@ -51,7 +46,7 @@ import { CatalogProduct } from '../../catalog/product.model';
         class="bg-surface-container-lowest/70 p-space-xs flex items-center justify-between rounded-lg"
       >
         <span class="font-caption text-caption pl-space-xs text-on-surface-variant">
-          Quantidade:
+          Quantidade ({{ product().unitMeasure }}):
         </span>
 
         <div
