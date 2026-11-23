@@ -1,31 +1,37 @@
 import { Routes } from '@angular/router';
-// import { activeCycleGuard } from './core/guards/active-cycle.guard';
+import { authGuard } from './core/auth/auth-guard';
+import { buyerGuard } from './core/auth/buyer-guard';
 
 export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'pedido/cei',
+    redirectTo: 'login',
   },
   {
-    path: 'pedido/:serviceCode',
-    loadComponent: () => import('./weekly-request/totem-page/totem-page').then((m) => m.TotemPage),
-    // canActivate: [activeCycleGuard],
+    path: 'login',
+    loadComponent: () => import('./core/auth/login-page/login-page').then((m) => m.LoginPage),
   },
   {
-    path: 'totem',
-    loadComponent: () => import('./weekly-request/totem-page/totem-page').then((m) => m.TotemPage),
-    // canActivate: [activeCycleGuard],
+    path: 'consolidacao',
+    canActivate: [authGuard, buyerGuard],
+    loadChildren: () =>
+      import('./consolidation/consolidation-routes').then((m) => m.consolidationRoutes),
   },
   {
-    path: 'ciclo-fechado',
-    loadComponent: () =>
-      import('./cycle-management/cycle-closed-page/cycle-closed-page').then(
-        (m) => m.CycleClosedPage,
-      ),
+    path: 'pedido',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./weekly-request/weekly-request-routes').then((m) => m.weeklyRequestRoutes),
+  },
+  {
+    path: '',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./cycle-management/cycle-management-routes').then((m) => m.cycleManagementRoutes),
   },
   {
     path: '**',
-    redirectTo: 'pedido/cei',
+    redirectTo: 'login',
   },
 ];
